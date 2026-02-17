@@ -1,0 +1,10 @@
+{
+  "admin": {
+    "email": "admin@biblioteca.com",
+    "senha": "admin123"
+  },
+  "padrao": {
+    "email": "usuario@teste.com",
+    "senha": "user123"
+  }
+}
