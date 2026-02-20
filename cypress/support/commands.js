@@ -26,14 +26,16 @@
 
 import cadastroPage from '../support/pages/cadastro-page'
 
-Cypress.Commands.add('preencherCadastro', (nome, email, telefone, senha, confirmarSenha) => {
+Cypress.Commands.add('preencherCadastro', (nome, email, telefone, senha, confirmarSenha, termosUso) => {
     cadastroPage.campoNome.type(nome)
     cadastroPage.campoEmail.type(email)
     cadastroPage.campoTelefone.type(telefone)
     cadastroPage.campoSenha.type(senha)
     cadastroPage.campoConfirmaSenha.type(confirmarSenha)
     cadastroPage.termosUso.check()
-    cadastroPage.botaoRegistrar.click()   
+    if (termosUso){
+        cadastroPage.botaoRegistrar.click()  
+    }
     cy.wait(100)
 })
 

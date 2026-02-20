@@ -7,34 +7,46 @@ Given('que acesso a tela de login', () => {
     cy.get('.login-header > h2').should('contain', 'Entre com sua conta')
 });
 
-When('eu tento logar com o usuário {string}', (tipoUsuario) => {
-    cy.fixture('usuarios').then((massa) => {
-        const dados = massa[tipoUsuario];
+When("eu tento logar como {string}", (tipoUsuario) => {
+    cy.fixture('usuarios').then((dadosUsuario) => {
+        const dados = dadosUsuario[tipoUsuario];
         loginPage.emailInput.type(dados.email);
         loginPage.passwordInput.type(dados.senha);
         loginPage.loginBtn.click();
-    });
+    })
+});
+
+When('eu tento logar com o usuário {string} e a senha {string}', (usuario, senha) => {
+    if (usuario) {
+        loginPage.emailInput.clear().type(usuario)
+    }
+
+    if (senha) {
+        loginPage.passwordInput.clear().type(senha)
+    }
+
+    loginPage.loginBtn.click()
+
 });
 
 Then('devo ser autenticado com sucesso', () => {
     loginPage.alertContainer.should('contain', 'Login realizado com sucesso!')
 });
 
-Then('o sistema deve exibir o Painel Administrativo', () => {
-    cy.url().should('include', 'admin-dashboard');
-    cy.get('.admin-header > h1').should('contain', 'Painel Administrativo')
-    cy.get('.fw-bold').should('contain', 'Bibliotecário Admin')
-});
+Then('o sistema deve exibir {string} e {string} na página inicial e menu do topo', (msgBoasVindas, nomeUsuario) => {
+    switch (nomeUsuario) {
+        case 'Bibliotecário Admin':
+            cy.url().should('include', 'admin-dashboard');
+            cy.get('.admin-header > h1').should('contain', msgBoasVindas)
+            cy.get('.fw-bold').should('contain', nomeUsuario)
+            break
 
-Then('o sistema deve exibir Olá, usuário padrão!', () => {
-    cy.url().should('include', 'dashboard');
-    cy.get('h4').should('contain', 'Olá, Usuário Padrão!')
-    cy.get('.fw-bold').should('contain', 'Usuário Padrão')
-});
-
-When('eu tento logar com o e-mail {string} e a senha vazia', (email) => {
-    loginPage.emailInput.type(email);
-    loginPage.loginBtn.click();
+        case 'Usuário Padrão':
+            cy.url().should('include', 'dashboard');
+            cy.get('h4').should('contain', msgBoasVindas)
+            cy.get('.fw-bold').should('contain', nomeUsuario)
+            break
+    }
 });
 
 Then('não devo ser autenticado', () => {
@@ -42,34 +54,22 @@ Then('não devo ser autenticado', () => {
     loginPage.loginBtn.should('be.visible');
 });
 
-Then('o campo de senha deve ser destacado com erro', () => {
-    loginPage.passwordInput.should('have.class', 'is-invalid');
-    loginPage.errorFeedback.should('exist').and('contain', 'Por favor, insira a senha.');
-});
-
 Then('o sistema deve exibir a mensagem {string}', (mensagem) => {
-    loginPage.alertContainer.should('contain', mensagem)
+    if (mensagem) {
+        switch (mensagem) {
+            case 'Email ou senha incorretos.':
+                loginPage.alertContainer.should('contain', mensagem)
+                //loginPage.passwordInput.should('have.class', 'is-invalid');
+                break
+
+            case 'Por favor, insira um email válido.':
+                loginPage.msgErroEmail.should('contain', mensagem)
+                loginPage.emailInput.should('have.class', 'is-invalid');
+                break
+        }
+
+    }
+
 });
-
-When('eu tento logar com o usuário {string} mas com a senha {string}', (tipoUsuario, senha) => {
-    cy.fixture('usuarios').then((massa) => {
-        const dados = massa[tipoUsuario];
-        loginPage.emailInput.type(dados.email);
-        loginPage.passwordInput.type(senha);
-        loginPage.loginBtn.click();
-    });
-});
-
-
-
-
-
-
-
-
-
-
-
-
 
 

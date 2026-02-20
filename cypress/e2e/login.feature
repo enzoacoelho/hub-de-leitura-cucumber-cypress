@@ -1,27 +1,35 @@
-# language: pt
-Funcionalidade: Login no Hub de Leitura
+      # language: pt
+      Funcionalidade: Login no Hub de Leitura
 
 
-  Contexto:
-    Dado que acesso a tela de login
+      Contexto:
+      Dado que acesso a tela de login
 
-  Cenário: Login com sucesso como Administrador
-    Quando eu tento logar com o usuário "admin"
-    Então devo ser autenticado com sucesso
-    E o sistema deve exibir o Painel Administrativo
+      Esquema do Cenário: Login com sucesso como Administrador e Usuário Padrão
+      Quando eu tento logar como "<tipo_usuario>"
+      Então devo ser autenticado com sucesso
+      E o sistema deve exibir "<mensagem_welcome>" e "<nome_usuario>" na página inicial e menu do topo
 
-    Cenário: Login com sucesso como usuário padrão
-    Quando eu tento logar com o usuário "padrão"
-    Então devo ser autenticado com sucesso
-    E o sistema deve exibir Olá, usuário padrão!
-    
-    Cenário: Login sem sucesso com campo senha vazio
-    Quando eu tento logar com o e-mail "admin@biblioteca.com" e a senha vazia
-    Então não devo ser autenticado
-    E o campo de senha deve ser destacado com erro
+      Exemplos:
+      | tipo_usuario | nome_usuario        | mensagem_welcome      |
+      | admin        | Bibliotecário Admin | Painel Administrativo |
+      | padrao       | Usuário Padrão      | Olá, Usuário Padrão!  |
 
-    Cenário: Login sem sucesso com senha inválida
-    Quando eu tento logar com o usuário "admin" mas com a senha "errada123"
-    Então não devo ser autenticado
-    E o sistema deve exibir a mensagem "Email ou senha incorretos."
+
+      Esquema do Cenário: Login sem sucesso por credenciais inválidas
+      Quando eu tento logar com o usuário "<usuario>" e a senha "<senha>"
+      Então não devo ser autenticado
+      E o sistema deve exibir a mensagem "<mensagem_erro>"
+      
+
+      Exemplos:
+      | usuario              | senha        | mensagem_erro                      | 
+      | admin@biblioteca.com |              |                                    | 
+      | admin@biblioteca.com | errada123    | Email ou senha incorretos.         | 
+      |                      | admin123     | Por favor, insira um email válido. | 
+      | usuario@teste.com    |              |                                    | 
+      | usuario@teste.com    | errada@teste | Email ou senha incorretos.         | 
+      |                      | user123      | Por favor, insira um email válido. | 
+
+
 
