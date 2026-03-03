@@ -30,6 +30,14 @@ pipeline {
             }
         }
 
+        stage("Aguardar backend subir") {
+            steps {
+                //bat 'timeout /T 15 /NOBREAK'
+                // ou, se quiser melhorar depois:
+                bat 'npx wait-on http://localhost:3000'
+            }
+        }
+
         stage("Clonar o projeto de teste - Hub de Leitura Cucumber Cypress") {
             steps {
                 bat '''
