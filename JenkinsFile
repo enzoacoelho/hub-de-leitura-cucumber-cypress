@@ -1,0 +1,74 @@
+pipeline {
+    agent any
+    tools { nodejs "nodejs"}
+
+    stages {
+
+        stage('Limpar o Workspace') {
+            steps {
+                cleanWs()
+            }
+        }
+
+        stage("Clonar o projeto Hub de Leitura Integrado") {
+            steps {
+                bat '''
+                    if exist hub-de-leitura-integrado rmdir /s /q hub-de-leitura-integrado
+                    git clone https://github.com/enzoacoelho/hub-de-leitura-integrado.git
+                '''
+            }
+        }
+
+        stage("Instalar dependencias no projeto Hub de Leitura Integrado") {
+            steps {
+                dir('hub-de-leitura-integrado') {
+                    bat '''
+                        call npm install 
+                        start /B npm start
+                    '''
+                }
+            }
+        }
+
+        stage("Clonar o projeto de teste - Hub de Leitura Cucumber Cypress") {
+            steps {
+                bat '''
+                    if exist hub-de-leitura-cucumber-cypress rmdir /s /q hub-de-leitura-cucumber-cypress
+                    git clone https://github.com/enzoacoelho/hub-de-leitura-cucumber-cypress.git
+                '''
+            }
+        }
+
+        stage("Instalar dependencias no projeto de teste - Hub de Leitura Cucumber Cypress") {
+            steps {
+                dir('hub-de-leitura-cucumber-cypress') {
+                    bat 'call npm install'
+                }
+            }
+        }
+
+        stage('Executar os testes automatizados') {
+            steps {
+                dir('hub-de-leitura-cucumber-cypress') {
+                    bat 'call npm test'
+                }
+
+            }
+        }
+    }
+
+   post {
+        always {
+            dir('hub-de-leitura-cucumber-cypress') {
+                archiveArtifacts artifacts: 'cypress/screenshots/**/*.*,cypress/videos/**/*.*', allowEmptyArchive: true
+
+            allure(
+                includeProperties: false,
+                jdk: '',
+                results: [[path: 'allure-results']]
+            )
+            }
+            bat 'taskkill /F /IM node.exe || exit 0'
+        }
+    }
+}
